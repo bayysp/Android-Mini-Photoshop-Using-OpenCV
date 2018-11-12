@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <ImageView
+        android:id="@+id/imageEdited"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="2"
+        android:src="@drawable/imagetesting"/>
+
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:max="125"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="9">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btn_grayscale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/grayscale"/>
+
+                <Button
+                    android:id="@+id/btn_thresholding"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/thresholding"/>
+
+                <Button
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="A" />
+                <Button
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="A"/>
+                <Button
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="A"/>
+
+                <Button
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="A"/>
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+    </LinearLayout>
+
+</LinearLayout>
