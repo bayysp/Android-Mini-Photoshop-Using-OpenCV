@@ -3,4 +3,8 @@
     <string name="upload_image">Upload Image</string>
     <string name="grayscale">Grayscale</string>
     <string name="thresholding">Thresholding</string>
+    <string name="gaussian_blur">Gaussian Blur</string>
+    <string name="backup">Backup</string>
+    <string name="show_histogram">Show Histogram</string>
+    <string name="canny_edge_detectection">Canny Edge Detectection</string>
 </resources>

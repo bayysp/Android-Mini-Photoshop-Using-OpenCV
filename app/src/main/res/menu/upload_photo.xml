@@ -6,7 +6,13 @@
         android:id="@+id/backup"
         android:icon="@drawable/ic_settings_backup_restore_black_24dp"
         app:showAsAction="ifRoom"
-        android:title="Backup"/>
+        android:title="@string/backup"/>
+
+    <item
+        android:id="@+id/histogram"
+        android:icon="@drawable/ic_show_chart_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="@string/show_histogram"/>
 
     <item
         android:id="@+id/upload_image"

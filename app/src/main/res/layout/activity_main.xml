@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="2"
-        android:src="@drawable/imagetesting"/>
+        android:src="@drawable/no_image"/>
 
     <SeekBar
         android:id="@+id/seek_bar"
@@ -46,13 +46,15 @@
                     android:text="@string/thresholding"/>
 
                 <Button
-                    android:layout_width="100dp"
+                    android:id="@+id/btn_gaussianblur"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="A" />
+                    android:text="@string/gaussian_blur" />
                 <Button
-                    android:layout_width="100dp"
+                    android:id="@+id/btn_canny_edgedetection"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="A"/>
+                    android:text="@string/canny_edge_detectection"/>
                 <Button
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
