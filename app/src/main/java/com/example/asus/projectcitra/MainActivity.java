@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         btnCannyEdgeDetection = findViewById(R.id.btn_canny_edgedetection);
 
         seekBar = findViewById(R.id.seek_bar);
+        seekBar.setVisibility(View.INVISIBLE);
         seekBar.setProgress(121);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 //            int progressChangedValue = 0;
@@ -99,131 +100,43 @@ public class MainActivity extends AppCompatActivity {
         btnGrayscale.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                convertToGray();
+                seekBar.setVisibility(View.INVISIBLE);
+                GrayScale grayScale = new GrayScale();
+                Bitmap result = grayScale.convertToGray(imageBitmap);
+                imageView.setImageBitmap(result);
             }
         });
 
         btnThresholding.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                convertToThresholding(value);
+                seekBar.setVisibility(View.VISIBLE);
+                Thresholding thresholding = new Thresholding();
+                Bitmap result = thresholding.convertToThresholding(value,imageBitmap);
+                imageView.setImageBitmap(result);
             }
         });
 
         btnGaussianBlur.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                convertToGaussianBlur(value);
+                seekBar.setVisibility(View.VISIBLE);
+                GaussianBlur gaussianBlur = new GaussianBlur();
+                Bitmap result = gaussianBlur.convertToGaussianBlur(value,imageBitmap);
+                imageView.setImageBitmap(result);
             }
         });
 
         btnCannyEdgeDetection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                convertToCanny(value);
+                seekBar.setVisibility(View.VISIBLE);
+                Canny canny = new Canny();
+                Bitmap result = canny.convertToCanny(value,imageBitmap);
+                imageView.setImageBitmap(result);
             }
         });
     }
-
-    //method which using to create a gray image
-    public void convertToGray(){
-        try{
-            Mat rgba = new Mat();
-            Mat grayMat = new Mat();
-
-            int width = imageBitmap .getWidth();
-            int height = imageBitmap.getHeight();
-            grayBitmap = Bitmap.createBitmap(width,height,Bitmap.Config.RGB_565); //create an gray bitmap image
-
-            Utils.bitmapToMat(imageBitmap,rgba); // convert bitmap into mat
-
-            Imgproc.cvtColor(rgba,grayMat,Imgproc.COLOR_BGR2GRAY); //use Rgba to change grayMat into grayscale image
-            Utils.matToBitmap(grayMat,grayBitmap); // after that, convert a mat into bitmap
-
-            imageView.setImageBitmap(grayBitmap);
-        }catch(Exception ex){
-            Toast.makeText(getApplicationContext(),"GAMBAR BELUM ADA" ,Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    private void convertToThresholding(int thresh) {
-        try{
-            Mat rgba = new Mat();
-            Mat grayMat = new Mat();
-            Mat thresholdMat = new Mat();
-
-//            BitmapFactory.Options o = new BitmapFactory.Options();
-//            o.inDither = false;
-//            o.inSampleSize =4;
-
-            int width = imageBitmap.getWidth();
-            int height = imageBitmap.getHeight();
-            thresholdBitmap = Bitmap.createBitmap(width,height,Bitmap.Config.RGB_565);
-
-            Utils.bitmapToMat(imageBitmap,rgba);
-            Imgproc.cvtColor(rgba,grayMat,Imgproc.COLOR_BGR2GRAY);
-            Imgproc.threshold(grayMat,thresholdMat,thresh,255,Imgproc.THRESH_BINARY);
-
-            Utils.matToBitmap(thresholdMat,thresholdBitmap);
-
-            imageView.setImageBitmap(thresholdBitmap);
-        }catch (Exception ex){
-            Toast.makeText(getApplicationContext(),"GAMBAR BELUM ADA" ,Toast.LENGTH_SHORT).show();
-        }
-
-    }
-
-    public void convertToGaussianBlur(int blur){
-        try{
-            if (blur%2 == 0){
-                blur = blur + 1;
-            }
-            Mat rgba = new Mat();
-            Mat gaussianBlurMat = new Mat();
-
-            int width = imageBitmap.getWidth();
-            int height = imageBitmap.getHeight();
-            gaussianBlurBitmap = Bitmap.createBitmap(width,height,Bitmap.Config.RGB_565);
-
-            Utils.bitmapToMat(imageBitmap,rgba);
-
-            Imgproc.GaussianBlur(rgba,gaussianBlurMat,new Size(blur,blur),0);
-
-            Utils.matToBitmap(gaussianBlurMat,gaussianBlurBitmap);
-            Log.d("Gaussian", blur+"");
-            imageView.setImageBitmap(gaussianBlurBitmap);
-
-        }catch (Exception ex){
-            Toast.makeText(getApplicationContext(),"GAMBAR BELUM ADA",Toast.LENGTH_SHORT).show();
-            Log.d("Gaussian", ex.getMessage());
-        }
-    }
-
-    public void convertToCanny(int value){
-        try{
-            Mat rgba = new Mat();
-            Mat grayMat = new Mat();
-            Mat cannyMat = new Mat();
-
-            int width = imageBitmap .getWidth();
-            int height = imageBitmap.getHeight();
-            cannyBitmap = Bitmap.createBitmap(width,height,Bitmap.Config.RGB_565); //create an gray bitmap image
-
-            Utils.bitmapToMat(imageBitmap,rgba); // convert bitmap into mat
-
-            Imgproc.cvtColor(rgba,grayMat,Imgproc.COLOR_BGR2GRAY); //use Rgba to change grayMat into grayscale image
-            Imgproc.Canny(grayMat,cannyMat,value,value-20);
-            Utils.matToBitmap(cannyMat,cannyBitmap); // after that, convert a mat into bitmap
-
-            imageView.setImageBitmap(cannyBitmap);
-        }catch (Exception ex){
-            Toast.makeText(getApplicationContext(),"GAMBAR BELUM ADA",Toast.LENGTH_SHORT).show();
-            Log.d("Gaussian", ex.getMessage());
-        }
-    }
-
 
     //running after user choose image in gallery
     @Override
