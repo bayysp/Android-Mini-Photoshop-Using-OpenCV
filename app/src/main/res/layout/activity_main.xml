@@ -56,14 +56,16 @@
                     android:layout_height="match_parent"
                     android:text="@string/canny_edge_detectection"/>
                 <Button
-                    android:layout_width="100dp"
+                    android:id="@+id/btn_brightness"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="A"/>
+                    android:text="@string/brightness"/>
 
                 <Button
+                    android:id="@+id/btn_contrast"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
-                    android:text="A"/>
+                    android:text="@string/contrast"/>
 
             </LinearLayout>
         </HorizontalScrollView>

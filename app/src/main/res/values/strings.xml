@@ -7,4 +7,6 @@
     <string name="backup">Backup</string>
     <string name="show_histogram">Show Histogram</string>
     <string name="canny_edge_detectection">Canny Edge Detectection</string>
+    <string name="brightness">Brightness</string>
+    <string name="contrast">Contrast</string>
 </resources>

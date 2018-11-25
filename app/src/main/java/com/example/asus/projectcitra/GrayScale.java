@@ -27,7 +27,6 @@ public class GrayScale {
             Imgproc.cvtColor(rgba,grayMat,Imgproc.COLOR_BGR2GRAY); //use Rgba to change grayMat into grayscale image
             Utils.matToBitmap(grayMat,grayBitmap); // after that, convert a mat into bitmap
 
-//            mainActivity.imageView.setImageBitmap(grayBitmap);
             return grayBitmap;
         }catch(Exception ex){
 //            Toast.makeText(mainActivity.getApplicationContext(),"GAMBAR BELUM ADA" ,Toast.LENGTH_SHORT).show();

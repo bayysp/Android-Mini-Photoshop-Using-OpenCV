@@ -3,6 +3,7 @@ package com.example.asus.projectcitra;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.drm.DrmStore;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     ImageView imageView;
     Uri imageUri;
     int value = 120;
-    Button btnGrayscale,btnThresholding,btnGaussianBlur,btnCannyEdgeDetection;
+    Button btnGrayscale,btnThresholding,btnGaussianBlur,btnCannyEdgeDetection,btnBrightness,btnContrast;
     Bitmap grayBitmap,thresholdBitmap,imageBitmap,gaussianBlurBitmap,cannyBitmap,restore;
     SeekBar seekBar;
 
@@ -70,15 +71,22 @@ public class MainActivity extends AppCompatActivity {
         btnThresholding = findViewById(R.id.btn_thresholding);
         btnGaussianBlur = findViewById(R.id.btn_gaussianblur);
         btnCannyEdgeDetection = findViewById(R.id.btn_canny_edgedetection);
+        btnBrightness = findViewById(R.id.btn_brightness);
+        btnContrast = findViewById(R.id.btn_contrast);
+
+        btnGrayscale.setEnabled(false);
+        btnThresholding.setEnabled(false);
+        btnContrast.setEnabled(false);
+        btnBrightness.setEnabled(false);
+        btnCannyEdgeDetection.setEnabled(false);
+        btnGaussianBlur.setEnabled(false);
 
         seekBar = findViewById(R.id.seek_bar);
         seekBar.setVisibility(View.INVISIBLE);
         seekBar.setProgress(121);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            int progressChangedValue = 0;
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                progressChangedValue = progress;
                 value = progress;
                 seekBar.setProgress(value);
 
@@ -111,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 seekBar.setVisibility(View.VISIBLE);
+                seekBar.setMax(120);
                 Thresholding thresholding = new Thresholding();
                 Bitmap result = thresholding.convertToThresholding(value,imageBitmap);
                 imageView.setImageBitmap(result);
@@ -121,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 seekBar.setVisibility(View.VISIBLE);
+                seekBar.setMax(50);
                 GaussianBlur gaussianBlur = new GaussianBlur();
                 Bitmap result = gaussianBlur.convertToGaussianBlur(value,imageBitmap);
                 imageView.setImageBitmap(result);
@@ -131,8 +141,35 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 seekBar.setVisibility(View.VISIBLE);
+                seekBar.setMax(120);
                 Canny canny = new Canny();
                 Bitmap result = canny.convertToCanny(value,imageBitmap);
+                imageView.setImageBitmap(result);
+            }
+        });
+
+        btnBrightness.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                seekBar.setVisibility(View.VISIBLE);
+                seekBar.setMax(120);
+                Brightness brightness = new Brightness();
+                Bitmap result = brightness.convertToBrightness(imageBitmap,value);
+                imageView.setImageBitmap(result);
+            }
+        });
+
+        btnContrast.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int max = 20;
+                seekBar.setVisibility(View.VISIBLE);
+                seekBar.setMax(max);
+                Contrast contrast = new Contrast();
+
+                double newValue = new Double(value);
+                double setVal = newValue/10;
+                Bitmap result = contrast.convertToContrast(imageBitmap,setVal);
                 imageView.setImageBitmap(result);
             }
         });
@@ -148,20 +185,19 @@ public class MainActivity extends AppCompatActivity {
                 //imageBitmap merupakan image yg diimport dari gallery
                 imageBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),imageUri);
                 restore = imageBitmap;
+
+                btnGrayscale.setEnabled(true);
+                btnThresholding.setEnabled(true);
+                btnContrast.setEnabled(true);
+                btnBrightness.setEnabled(true);
+                btnCannyEdgeDetection.setEnabled(true);
+                btnGaussianBlur.setEnabled(true);
             }catch (Exception e){
 
             }
 
             imageView.setImageBitmap(imageBitmap);
 
-
-            try{
-                InputStream inputStream = getContentResolver().openInputStream(imageUri);
-                Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                imageView.setImageBitmap(bitmap);
-            }catch (FileNotFoundException e){
-
-            }
         }
     }
 
@@ -184,52 +220,10 @@ public class MainActivity extends AppCompatActivity {
                 break;
 
             case R.id.histogram :
-                showHistogram();
                 break;
         }
 
         return true;
-    }
-
-    public void showHistogram(){
-//        Mat rgba = new Mat();
-//        Mat histoMat = new Mat();
-//
-//        Utils.bitmapToMat(imageBitmap,rgba);
-//        Size rgbaSize = rgba.size();
-//
-//        //set the amount of barr in histogram
-//        int histSize = 256;
-//        MatOfInt histogramSize = new MatOfInt(histSize);
-//
-//        // Set the height of the histogram and width of the bar.
-//        int histogramHeight = (int) rgbaSize.height;
-//        int binWidth = 5;
-//
-//        //set the value range
-//        MatOfFloat histogramRange = new MatOfFloat(0f,256f);
-//
-//        // Create two separate lists: one for colors and one for channels (these will be used as separate datasets).
-//        Scalar[] colorsRgb = new Scalar[]{new Scalar(200, 0, 0, 255), new Scalar(0, 200, 0, 255), new Scalar(0, 0, 200, 255)};
-//        MatOfInt[] channels = new MatOfInt[]{new MatOfInt(0), new MatOfInt(1), new MatOfInt(2)};
-//
-//        // Create an array to be saved in the histogram and a second array, on which the histogram chart will be drawn.
-//        Mat[] histograms = new Mat[]{new Mat(), new Mat(), new Mat()};
-//
-//        for (int i = 0; i < channels.length; i++) {
-//            Imgproc.calcHist(Collections.singletonList(rgba), channels[i], new Mat(), histograms[i], histogramSize, histogramRange);
-//            Core.normalize(histograms[i], histograms[i], histogramHeight, 0, Core.NORM_INF);
-//            for (int j = 0; j < histSize; j++) {
-//                Point p1 = new Point(binWidth * (j - 1), histogramHeight - Math.round(histograms[i].get(j - 1, 0)[0]));
-//                Point p2 = new Point(binWidth * j, histogramHeight - Math.round(histograms[i].get(j, 0)[0]));
-//                Imgproc.line(histoMat, p1, p2, colorsRgb[i], 2, 8, 0);
-//            }
-//        }
-//
-//
-//        Utils.matToBitmap(histoMat, histBitmap);
-//        imageView.setImageBitmap(histBitmap);
-
     }
 
 }
