@@ -9,4 +9,5 @@
     <string name="canny_edge_detectection">Canny Edge Detectection</string>
     <string name="brightness">Brightness</string>
     <string name="contrast">Contrast</string>
+    <string name="save_image">Save Image</string>
 </resources>

@@ -1,7 +1,10 @@
 package com.example.asus.projectcitra;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.drm.DrmStore;
 import android.graphics.Bitmap;
@@ -10,8 +13,10 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,31 +29,25 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
-import org.opencv.android.OpenCVLoader;
-import org.opencv.android.Utils;
-import org.opencv.core.Core;
-import org.opencv.core.Mat;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfInt;
-import org.opencv.core.Point;
-import org.opencv.core.Scalar;
-import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Collections;
+import com.squareup.picasso.Picasso;
+
+import org.opencv.android.OpenCVLoader;
+
+import java.io.ByteArrayOutputStream;
+import java.util.UUID;
+
+import dmax.dialog.SpotsDialog;
 
 public class MainActivity extends AppCompatActivity {
 
 
+    private static final int PERMISSION_REQUEST_CODE = 1000;
     ImageView imageView;
     Uri imageUri;
     int value = 120;
     Button btnGrayscale,btnThresholding,btnGaussianBlur,btnCannyEdgeDetection,btnBrightness,btnContrast;
-    Bitmap grayBitmap,thresholdBitmap,imageBitmap,gaussianBlurBitmap,cannyBitmap,restore;
+    Bitmap grayBitmap,thresholdBitmap,imageBitmap,gaussianBlurBitmap,cannyBitmap,restore,newBitmap;
     SeekBar seekBar;
 
 
@@ -63,6 +62,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"OpenCV Succes" ,Toast.LENGTH_SHORT).show();
         }else{
             Toast.makeText(getApplicationContext(),"OpenCV Error" ,Toast.LENGTH_SHORT).show();
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED){
+            requestPermissions(new String[]{
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+            },PERMISSION_REQUEST_CODE);
         }
 
         imageView = findViewById(R.id.imageEdited);
@@ -112,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 GrayScale grayScale = new GrayScale();
                 Bitmap result = grayScale.convertToGray(imageBitmap);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
 
@@ -123,6 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 Thresholding thresholding = new Thresholding();
                 Bitmap result = thresholding.convertToThresholding(value,imageBitmap);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
 
@@ -134,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 GaussianBlur gaussianBlur = new GaussianBlur();
                 Bitmap result = gaussianBlur.convertToGaussianBlur(value,imageBitmap);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
 
@@ -145,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 Canny canny = new Canny();
                 Bitmap result = canny.convertToCanny(value,imageBitmap);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
 
@@ -156,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
                 Brightness brightness = new Brightness();
                 Bitmap result = brightness.convertToBrightness(imageBitmap,value);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
 
@@ -171,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
                 double setVal = newValue/10;
                 Bitmap result = contrast.convertToContrast(imageBitmap,setVal);
                 imageView.setImageBitmap(result);
+                newBitmap = result;
             }
         });
     }
@@ -211,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.upload_image:
-                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.
+                        Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent,100);
                 break;
 
@@ -221,9 +234,62 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.histogram :
                 break;
+                
+            case R.id.save_image :
+                saveImageEdited();
+                break;
         }
 
         return true;
     }
+
+    private void saveImageEdited() {
+        if (ActivityCompat.checkSelfPermission(MainActivity.this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            Toast.makeText(this,"You Should Grant Permission",Toast.LENGTH_SHORT).show();
+        }else {
+            if (imageBitmap == null){
+                Toast.makeText(this,"Image is Empty",Toast.LENGTH_SHORT).show();
+            }else {
+                AlertDialog alertDialog = new SpotsDialog(MainActivity.this);
+                alertDialog.show();
+                alertDialog.setMessage("Saving Image...");
+
+                String fileName = UUID.randomUUID().toString()+".jpg";
+                Picasso.with(getBaseContext()).
+                        load(getImageUri(MainActivity.this,newBitmap))
+                        .into(new SaveImageHelper(getBaseContext(),
+                                alertDialog,
+                                getApplicationContext().getContentResolver(),
+                                fileName,
+                                "Image Description"));
+                Toast.makeText(this,"Image Saved",Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case PERMISSION_REQUEST_CODE :
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this,"Permission Granted",Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(this,"Permission Denied",Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
+
+    private Uri getImageUri(Context context, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
 
 }
